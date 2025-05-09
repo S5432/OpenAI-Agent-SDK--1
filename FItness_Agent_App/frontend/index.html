@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Coach</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-800 min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
+        <h1 class="text-3xl font-bold text-center mb-6">Fitness Coach</h1>
+        
+        <!-- Query Type Selector -->
+        <div class="mb-4">
+            <label for="queryType" class="block text-sm font-medium text-gray-700">Select Query Type</label>
+            <select id="queryType" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" onchange="toggleForm()">
+                <option value="general">General Fitness Tips</option>
+                <option value="workout">Workout Plan</option>
+                <option value="nutrition">Nutrition Plan</option>
+            </select>
+        </div>
+
+        <!-- General Fitness Form -->
+        <div id="generalForm" class="form-section">
+            <div class="mb-4">
+                <label for="generalQuery" class="block text-sm font-medium text-gray-700">Your Question</label>
+                <input type="text" id="generalQuery" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="E.g., Tips for beginners">
+            </div>
+            <button onclick="submitQuery('general')" class="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700">Get Tips</button>
+        </div>
+
+        <!-- Workout Form -->
+        <div id="workoutForm" class="form-section hidden">
+            <div class="mb-4">
+                <label for="muscleGroup" class="block text-sm font-medium text-gray-700">Muscle Group</label>
+                <select id="muscleGroup" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                    <option value="chest">Chest</option>
+                    <option value="back">Back</option>
+                    <option value="legs">Legs</option>
+                    <option value="arms">Arms</option>
+                    <option value="core">Core</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="level" class="block text-sm font-medium text-gray-700">Fitness Level</label>
+                <select id="level" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                </select>
+            </div>
+            <button onclick="submitQuery('workout')" class="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700">Get Workout Plan</button>
+        </div>
+
+        <!-- Nutrition Form -->
+        <div id="nutritionForm" class="form-section hidden">
+            <div class="mb-4">
+                <label for="goal" class="block text-sm font-medium text-gray-700">Fitness Goal</label>
+                <select id="goal" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                    <option value="weight loss">Weight Loss</option>
+                    <option value="muscle gain">Muscle Gain</option>
+                    <option value="maintenance">Maintenance</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="weight" class="block text-sm font-medium text-gray-700">Weight (kg)</label>
+                <input type="number" id="weight" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="E.g., 70">
+            </div>
+            <div class="mb-4">
+                <label for="height" class="block text-sm font-medium text-gray-700">Height (cm)</label>
+                <input type="number" id="height" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="E.g., 170">
+            </div>
+            <div class="mb-4">
+                <label for="age" class="block text-sm font-medium text-gray-700">Age</label>
+                <input type="number" id="age" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="E.g., 30">
+            </div>
+            <div class="mb-4">
+                <label for="gender" class="block text-sm font-medium text-gray-700">Gender</label>
+                <select id="gender" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <button onclick="submitQuery('nutrition')" class="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700">Get Meal Plan</button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="mt-6 hidden">
+            <h2 class="text-xl font-bold mb-4">Results</h2>
+            <div id="resultContent" class="bg-gray-50 p-4 rounded-md"></div>
+        </div>
+    </div>
+
+    <script>
+        function toggleForm() {
+            const queryType = document.getElementById('queryType').value;
+            document.getElementById('generalForm').classList.add('hidden');
+            document.getElementById('workoutForm').classList.add('hidden');
+            document.getElementById('nutritionForm').classList.add('hidden');
+            document.getElementById(`${queryType}Form`).classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+        }
+
+        async function submitQuery(type) {
+            const resultsDiv = document.getElementById('results');
+            const resultContent = document.getElementById('resultContent');
+            resultContent.innerHTML = 'Loading...';
+            resultsDiv.classList.remove('hidden');
+
+            try {
+                let url = 'http://localhost:8000/fitness/';
+                let data = {};
+
+                if (type === 'general') {
+                    url += 'general';
+                    data.query = document.getElementById('generalQuery').value;
+                } else if (type === 'workout') {
+                    url += 'workout';
+                    data.muscle_group = document.getElementById('muscleGroup').value;
+                    data.level = document.getElementById('level').value;
+                } else if (type === 'nutrition') {
+                    url += 'nutrition';
+                    data.goal = document.getElementById('goal').value;
+                    data.weight_kg = parseFloat(document.getElementById('weight').value);
+                    data.height_cm = parseFloat(document.getElementById('height').value);
+                    data.age = parseInt(document.getElementById('age').value);
+                    data.gender = document.getElementById('gender').value;
+                }
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                resultContent.innerHTML = formatResult(type, result);
+            } catch (error) {
+                resultContent.innerHTML = `<p class="text-red-600">Error: ${error.message}</p>`;
+            }
+        }
+
+        function formatResult(type, result) {
+            if (type === 'general') {
+                return `<p>${result.response}</p>`;
+            } else if (type === 'workout') {
+                return `
+                    <p><strong>Focus Area:</strong> ${result.focus_area}</p>
+                    <p><strong>Difficulty:</strong> ${result.difficulty}</p>
+                    <p><strong>Exercises:</strong></p>
+                    <ul class="list-disc pl-5">
+                        ${result.exercises.map(ex => `<li>${ex}</li>`).join('')}
+                    </ul>
+                    <p><strong>Notes:</strong> ${result.notes}</p>
+                `;
+            } else if (type === 'nutrition') {
+                return `
+                    <p><strong>Daily Calories:</strong> ${result.daily_calories}</p>
+                    <p><strong>Protein:</strong> ${result.protein_grams}g</p>
+                    <p><strong>Carbs:</strong> ${result.carbs_grams}g</p>
+                    <p><strong>Fat:</strong> ${result.fat_grams}g</p>
+                    <p><strong>Meal Suggestions:</strong></p>
+                    <ul class="list-disc pl-5">
+                        ${result.meal_suggestions.map(meal => `<li>${meal}</li>`).join('')}
+                    </ul>
+                    <p><strong>Notes:</strong> ${result.notes}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

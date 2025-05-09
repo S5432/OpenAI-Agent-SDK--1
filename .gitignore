@@ -135,6 +135,18 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.env/
+env/ 
+.env 
+Basics_of_openai_agent_sdk\.env/
+Basics_of_openai_agent_sdk\.env 
+
+FItness_Agent_App\backend\.env/
+FItness_Agent_App\backend\.env
+
+.myenv/
+.myenv 
+myenv/
 
 # Spyder project settings
 .spyderproject
